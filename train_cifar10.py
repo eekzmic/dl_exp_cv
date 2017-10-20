@@ -23,7 +23,7 @@ def main():
                         help='Directory to output the result')
     parser.add_argument('--resume', '-r', default='',
                         help='Resume the training from snapshot')
-    parser.add_argument('--mini_cifar', '-d', default='mini_cifar/train',
+    parser.add_argument('--dataset', '-d', default='mini_cifar/train',
                         help='Directory for train mini_cifar')
     args = parser.parse_args()
 
@@ -47,13 +47,9 @@ def main():
 
     # Load the Cifar-10 mini_cifar
     # trainとvalに分ける
-    train, _ = chainer.datasets.split_dataset_random(
-        MyCifarDataset(args.dataset),
-        6000
-    )
     train, val = chainer.datasets.split_dataset_random(
-        train,
-        5000
+        MyCifarDataset(args.dataset),
+        1000
     )
     print('train data : {}'.format(len(train)))
     print('val data : {}'.format(len(val)))
