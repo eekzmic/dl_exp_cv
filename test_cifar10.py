@@ -8,13 +8,11 @@ from net import Cifar_CNN
 from dataset import MyCifarDataset
 
 def main():
-    parser = argparse.ArgumentParser(description='Chainer example: MNIST')
+    parser = argparse.ArgumentParser(description='Practice: Cifar10')
     parser.add_argument('--batchsize', '-b', type=int, default=100,
                         help='Number of images in each mini-batch')
     parser.add_argument('--gpu', '-g', type=int, default=-1,
                         help='GPU ID (negative value indicates CPU)')
-    parser.add_argument('--out', '-o', default='result',
-                        help='Directory to output the result')
     parser.add_argument('--model', '-m', default='result/model_20',
                         help='Path to the model')
     parser.add_argument('--dataset', '-d', default='mini_cifar/test',
