@@ -44,32 +44,3 @@ class MyCifarDataset(chainer.dataset.DatasetMixin):
     def get_label_from_path(self, path):
         # TODO pathからlabel(0~9)を推測して返す関数を実装せよ
         raise NotImplementedError
-
-
-class CompletedCifarDataset(chainer.dataset.DatasetMixin):
-
-    def __init__(self, train_dir):
-        self._paths = glob(os.path.join(train_dir, '*/*.png'))
-        self._labels = {
-            'airplane': 0,
-            'automobile': 1,
-            'bird': 2,
-            'cat': 3,
-            'deer': 4,
-            'dog': 5,
-            'frog': 6,
-            'horse': 7,
-            'ship': 8,
-            'truck': 9
-        }
-
-
-    def __len__(self):
-        return len(self._paths)
-
-    def get_example(self, i):
-        path = self._paths[i]
-        label = self._labels[path.split('/')[-2]]
-        image = np.array(Image.open(path).convert('RGB'), np.float32)
-        image_for_chainer = np.transpose(image, (2, 0, 1))
-        return image_for_chainer, label
