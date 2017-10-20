@@ -22,4 +22,8 @@ def make(train=True):
 
 
 if __name__ == '__main__':
-    make(train=True)
+    import argparse
+    parser = argparse.ArgumentParser(description='Chainer example: MNIST')
+    parser.add_argument('--train',action='store_true' , default=False)
+    args = parser.parse_args()
+    make(train=args.train)
