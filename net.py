@@ -60,12 +60,13 @@ class Cifar_CNN(chainer.Chain):
     def __init__(self, n_out):
         super(Cifar_CNN, self).__init__()
         with self.init_scope():
-            self.conv1_1 = L.Convolution2D(3, 32, 3)
+            self.model = L.VGG16Layers()
             self.l1 = L.Linear(None, 512)
             self.l_out = L.Linear(512, n_out)
 
     def __call__(self, x, t):
-        h = F.max_pooling_2d(F.relu(self.conv1_1(x)), 2)
+        # h = F.max_pooling_2d(F.relu(self.conv1_1(x)), 2)
+        h = self.model(x)
         h = F.relu(self.l1(h))
         h = self.l_out(h)
 
@@ -81,7 +82,7 @@ class Cifar_CNN(chainer.Chain):
             return h
 
     def predict(self, x):
-        h = F.max_pooling_2d(F.relu(self.conv1_1(x)), 2)
+        h = self.model(x)
         h = F.relu(self.l1(h))
         h = self.l_out(h)
         predicts = F.argmax(h, axis=1)
