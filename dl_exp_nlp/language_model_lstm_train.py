@@ -1,49 +1,86 @@
 #!/usr/bin/env python3
-
+import matplotlib
+matplotlib.use('Agg')
 import sys
 import chainer
 from chainer import optimizers, cuda
+from chainer import training
+from chainer.training import extensions
+import numpy as np
 
 import sentence_data
 from sentence_data import EOS_ID
 from language_model_lstm import LanguageModelLSTM
+from language_model_lstm import PADDING
 
-dataset = sentence_data.SentenceData("dataset/data_1000.txt")
+gpu_id = 0
+epoch = 10
+batchsize = 10
+out = 'result'
+resume_npz = ''
+model_npz = ''
 
-model = LanguageModelLSTM(dataset.japanese_word_size())
+class LangDataset(chainer.dataset.DatasetMixin):
+    def __init__(self, sentences):
+        super(LangDataset, self).__init__()
+        self.sentences = sentences
+        self.max_sentence_words = self.max_sentence_size()
 
-optimizer = optimizers.Adam()
-optimizer.setup(model)
+    def __len__(self):
+        return len(self.sentences)
 
-epoch_num = 10
-for epoch in range(epoch_num):
-    print("{0} / {1} epoch start.".format(epoch + 1, epoch_num))
+    def max_sentence_size(self):
+        return max([len(s) for s in self.sentences])
 
-    sum_loss = 0.0
-    for i, sentence in enumerate(dataset.japanese_sentences()):
-        model.reset_state()
-        model.zerograds()
-        accum_loss = None
-        # 文の1単語目を入力して出力された2単語目，
-        # 文の1単語目と2単語目を入力して出力された3単語目，のように，
-        # 文の1～n-1単語目を入力して出力されたn単語目を全て確認して，
-        # accum_lossに加算する
-        # 最後の単語を入力した後，EOSが正しく出力されるかどうかも確認する
-        for cur_word, next_word in zip(sentence, sentence[1:] + [EOS_ID]):
-            loss = model.loss(cur_word, next_word)
-            accum_loss = loss if accum_loss is None else accum_loss + loss
-        accum_loss.backward()
-        accum_loss.unchain_backward()
-        optimizer.update()
-        sum_loss += float(cuda.to_cpu(accum_loss.data))
+    def get_example(self, i):
+        source_sentence = self.sentences[i]
+        target_sentence = source_sentence[1:]
+        source_sentence.extend(
+            [PADDING] * (self.max_sentence_words - len(source_sentence)))
+        target_sentence.extend(
+            [PADDING] * (self.max_sentence_words - len(target_sentence)))
+        return np.array(source_sentence, np.int32).reshape((-1, 1)),\
+               np.array(target_sentence, np.int32).reshape((-1, 1))
 
-        if (i + 1) % 100 == 0:
-            print("{0} / {1} sentences finished.".format(
-                i + 1, dataset.sentences_size()))
+if __name__ == '__main__':
+    dataset = sentence_data.SentenceData("dataset/data_1000.txt")
+    japanese_dataset = LangDataset(dataset.japanese_sentences())
+    print('{} japanese sentences found'.format(len(japanese_dataset)))
 
-    print("mean loss = {0}.".format(sum_loss / dataset.sentences_size()))
+    model = LanguageModelLSTM(dataset.japanese_word_size())
+    if gpu_id >= 0:
+        cuda.get_device_from_id(gpu_id).use()
+        model.to_gpu()
 
-    # 1 epoch 毎にファイルに書き出す
-    model_file = "trained_model/langage_model_lstm_" + \
-        str(epoch + 1) + ".model"
-    model.save_model(model_file)
+    optimizer = optimizers.Adam()
+    optimizer.setup(model)
+
+    train_iter = chainer.iterators.SerialIterator(
+        japanese_dataset, batchsize, repeat=True, shuffle=True)
+
+
+    updater = training.StandardUpdater(train_iter, optimizer, device=gpu_id)
+    trainer = training.Trainer(updater, (10, 'epoch'), out='result')
+
+        # Evaluate the model with the test mini_cifar for each epoch
+    trainer.extend(extensions.dump_graph('main/loss'))
+
+    trainer.extend(extensions.snapshot(filename='snapshot_{.updater.epoch}'), trigger=(1, 'epoch'))
+    trainer.extend(extensions.snapshot_object(model, 'model_{.updater.epoch}'), trigger=(1, 'epoch'))
+
+
+    trainer.extend(extensions.LogReport())
+    if extensions.PlotReport.available():
+        trainer.extend(
+            extensions.PlotReport(['main/loss'], 'epoch', file_name='loss.png'))
+
+    trainer.extend(extensions.PrintReport(
+        ['epoch', 'iteration', 'main/loss', 'elapsed_time']))
+
+    trainer.extend(extensions.ProgressBar())
+
+    if resume_npz:
+        chainer.serializers.load_npz(resume_npz, trainer)
+
+    with chainer.using_config('train', True):
+        trainer.run()

@@ -1,5 +1,3 @@
-# EOSとは End Of Sentence の略であり，文の終わりを意味する
-# EOSの単語IDを0と定義する
 EOS_ID = 0
 
 
