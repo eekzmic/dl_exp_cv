@@ -6,7 +6,7 @@ matplotlib.use('Agg')
 import chainer
 from chainer import training
 from chainer.training import extensions
-from net import MNIST_CNN
+from net import MnistCNN
 
 def main():
     parser = argparse.ArgumentParser(description='Chainer example: MNIST')
@@ -32,7 +32,7 @@ def main():
     # Set up a neural network to train
     # Classifier reports softmax cross entropy loss and accuracy at every
     # iteration, which will be used by the PrintReport extension below.
-    model = MNIST_CNN(10)
+    model = MnistCNN(10)
     if args.gpu >= 0:
         # Make a specified GPU current
         chainer.cuda.get_device_from_id(args.gpu).use()

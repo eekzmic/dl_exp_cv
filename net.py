@@ -2,6 +2,7 @@ import chainer
 from chainer import links as L
 from chainer import functions as F
 
+
 class MLP(chainer.Chain):
     def __init__(self, n_units, n_out):
         super(MLP, self).__init__()
@@ -32,9 +33,9 @@ class MLP(chainer.Chain):
         return h
 
 
-class MNIST_CNN(chainer.Chain):
+class MnistCNN(chainer.Chain):
     def __init__(self, n_out):
-        super(MNIST_CNN, self).__init__()
+        super(MnistCNN, self).__init__()
         with self.init_scope():
             self.conv1 = ('畳み込み層を定義してね')
             self.conv2 = ('畳み込み層を定義してね')
@@ -56,9 +57,9 @@ class MNIST_CNN(chainer.Chain):
             return h
 
 
-class Cifar_CNN(chainer.Chain):
+class CifarCNN(chainer.Chain):
     def __init__(self, n_out):
-        super(Cifar_CNN, self).__init__()
+        super(CifarCNN, self).__init__()
         with self.init_scope():
             self.model = L.VGG16Layers()
             self.l1 = L.Linear(None, 512)

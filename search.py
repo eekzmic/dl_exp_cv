@@ -12,7 +12,7 @@ def search(src, db_features, db_paths, k, gpu):
         chainer.cuda.get_device_from_id(gpu).use()
         MODEL.to_gpu()
         db_features = chainer.cuda.to_gpu(db_features)
-    with chainer.using_config('train', False):
+    with chainer.using_config('train', False), chainer.no_backprop_mode():
         src_df = MODEL.extract([Image.open(src, 'r').convert('RGB')], ['fc7'], (224, 224))['fc7'].data
     # sklearnならcdistが速い
     distances = np.array(

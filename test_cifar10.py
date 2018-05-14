@@ -4,7 +4,7 @@ import matplotlib
 
 matplotlib.use('Agg')
 import chainer
-from net import Cifar_CNN
+from net import CifarCNN
 from dataset import MyCifarDataset
 
 def main():
@@ -22,7 +22,7 @@ def main():
     print('GPU: {}'.format(args.gpu))
     print('')
 
-    model = Cifar_CNN(10)
+    model = CifarCNN(10)
     chainer.serializers.load_npz(args.model, model)
 
     if args.gpu >= 0:
@@ -46,10 +46,11 @@ def main():
             break
         images = model.xp.array([image for image, _ in batch])
         labels = model.xp.array([label for _, label in batch])
-        predicts = model.predict(images)
-        for l, p in zip(labels, predicts):
-            if l == p:
-                correct_cnt += 1
+        with chainer.using_config('train', False), chainer.no_backprop_mode():
+            predicts = model.predict(images)
+            for l, p in zip(labels, predicts):
+                if l == p:
+                    correct_cnt += 1
 
     print('accuracy : {}'.format(correct_cnt/len(test)))
 

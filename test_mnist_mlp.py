@@ -34,7 +34,10 @@ def main():
         print("invalid input")
         return
     img_array = model.xp.asarray(img,dtype=model.xp.float32).reshape(1,784)
-    result = model.predict(img_array)
+    with chainer.using_config('train', False), chainer.no_backprop_mode():
+        result = model.predict(img_array)
     print("predict:", model.xp.argmax(result.data))
+
+
 if __name__ == '__main__':
     main()
