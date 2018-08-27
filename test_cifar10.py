@@ -39,18 +39,18 @@ def main():
                                                   repeat=False, shuffle=False)
 
     correct_cnt = 0
-    while True:
-        try:
-            batch = test_iter.next()
-        except StopIteration:
-            break
-        images = model.xp.array([image for image, _ in batch])
-        labels = model.xp.array([label for _, label in batch])
-        with chainer.using_config('train', False), chainer.no_backprop_mode():
-            predicts = model.predict(images)
-            for l, p in zip(labels, predicts):
-                if l == p:
-                    correct_cnt += 1
+    with chainer.using_config('train', False), chainer.no_backprop_mode():
+        while True:
+            try:
+                batch = test_iter.next()
+            except StopIteration:
+                break
+            images = model.xp.array([image for image, _ in batch])
+            labels = model.xp.array([label for _, label in batch])
+                predicts = model.predict(images)
+                for l, p in zip(labels, predicts):
+                    if l == p:
+                        correct_cnt += 1
 
     print('accuracy : {}'.format(correct_cnt/len(test)))
 
