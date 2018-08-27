@@ -47,10 +47,10 @@ def main():
                 break
             images = model.xp.array([image for image, _ in batch])
             labels = model.xp.array([label for _, label in batch])
-                predicts = model.predict(images)
-                for l, p in zip(labels, predicts):
-                    if l == p:
-                        correct_cnt += 1
+            predicts = model.predict(images)
+            for l, p in zip(labels, predicts):
+                if l == p:
+                    correct_cnt += 1
 
     print('accuracy : {}'.format(correct_cnt/len(test)))
 
