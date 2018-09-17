@@ -42,7 +42,8 @@ class MnistCNN(chainer.Chain):
             self.l_out = L.Linear(10 * 7 * 7, n_out)
 
     def __call__(self, x, t):
-        h = F.relu(self.conv1(x))
+        h = 'xのshapeを(len(x), 784)から(len(x), 1, 28, 28)に変形してね'
+        h = F.relu(self.conv1(h))
         h = F.relu(self.conv2(h))
         h = self.l_out(h)
 
@@ -62,13 +63,11 @@ class CifarCNN(chainer.Chain):
         super(CifarCNN, self).__init__()
         with self.init_scope():
             self.model = L.VGG16Layers()
-            self.l1 = L.Linear(None, 512)
-            self.l_out = L.Linear(512, n_out)
+            self.l_out = L.Linear(None, n_out)
 
     def __call__(self, x, t):
-        # h = F.max_pooling_2d(F.relu(self.conv1_1(x)), 2)
-        h = self.model(x)
-        h = F.relu(self.l1(h))
+        with chainer.using_config('train', False), chainer.no_backprop_mode():
+            h = self.model(x, layers=['pool5'])['pool5']
         h = self.l_out(h)
 
         t = self.xp.asarray(t, self.xp.int32)
@@ -83,8 +82,7 @@ class CifarCNN(chainer.Chain):
             return h
 
     def predict(self, x):
-        h = self.model(x)
-        h = F.relu(self.l1(h))
+        h = self.model(x, layers=['pool5'])['pool5']
         h = self.l_out(h)
         predicts = F.argmax(h, axis=1)
         return predicts.data

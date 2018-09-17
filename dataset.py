@@ -30,8 +30,11 @@ class MyCifarDataset(chainer.dataset.DatasetMixin):
 
         # TODO self._pathsからi番目のpathを取得して画像として読み込む
         path = ''
-        image = np.array(Image.open(path).convert('RGB'), np.float32)
-
+        image = np.array(Image.open(path).convert('RGB').resize((224, 224)), np.float32)
+        mean = [123.68, 116.779, 103.939]
+        for i in range(3):
+            image[i] -= mean[i]
+            
         # 画像データは3次元配列で入っており，その軸は(幅，高さ，チャンネル)の順である
         # TODO chainerは(チャンネル，幅，高さ)で入力することを求めるのでtransposeを行なう
         image_for_chainer = image.transpose(('?', '?', '?'))
