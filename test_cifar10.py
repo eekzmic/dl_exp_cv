@@ -1,9 +1,8 @@
 import argparse
 
-import matplotlib
-
-matplotlib.use('Agg')
 import chainer
+from chainer import serializers
+
 from net import CifarCNN
 from dataset import MyCifarDataset
 
@@ -23,7 +22,7 @@ def main():
     print('')
 
     model = CifarCNN(10)
-    chainer.serializers.load_npz(args.model, model)
+    serializers.load_npz(args.model, model)
 
     if args.gpu >= 0:
         # Make a specified GPU current

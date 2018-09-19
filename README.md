@@ -2,16 +2,16 @@
 MNISTデータセットをMLPによって学習します
 MLPの定義はnet.pyのMLPクラスにあります
 
-- test_mnist_mlp.pu
+- test_mnist_mlp.py
 手書き文字を読み込んで学習済みモデルに通し，その数字が何であるかを予測します
 
 - train_mnist_cnn.py
 MNISTデータセットをCNNによって学習します
-CNNの定義はnet.pyのMNIST_CNNクラスを完成させてください
+CNNの定義はnet.pyのMnistCNNクラスを完成させてください
 
 - train_cifar10.py
 cifar10をCNNで学習します．
-CNNの定義はnet.pyのCifar＿CNNにあります．
+CNNの定義はnet.pyのCifarCNNにあります．
 データセットの読み込みの定義をdataset.pyに書いて完成させてください
 
 - test_cifar10.py

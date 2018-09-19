@@ -1,16 +1,19 @@
+try:
+    import matplotlib
+    matplotlib.use('Agg')
+except ImportError:
+    pass
 import argparse
 
-import matplotlib
-
-matplotlib.use('Agg')
 import chainer
 from chainer import training
 from chainer.training import extensions
+
 from net import CifarCNN
 from dataset import MyCifarDataset
 
 def main():
-    parser = argparse.ArgumentParser(description='Chainer example: MNIST')
+    parser = argparse.ArgumentParser(description='Chainer example: CIFAR10')
     parser.add_argument('--batchsize', '-b', type=int, default=100,
                         help='Number of images in each mini-batch')
     parser.add_argument('--epoch', '-e', type=int, default=20,

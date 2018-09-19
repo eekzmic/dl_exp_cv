@@ -1,11 +1,14 @@
+try:
+    import matplotlib
+    matplotlib.use('Agg')
+except ImportError:
+    pass
 import argparse
 
-import matplotlib
-
-matplotlib.use('Agg')
 import chainer
 from chainer import training
 from chainer.training import extensions
+
 from net import MLP
 
 

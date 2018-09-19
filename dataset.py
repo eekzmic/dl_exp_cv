@@ -32,9 +32,8 @@ class MyCifarDataset(chainer.dataset.DatasetMixin):
         path = ''
         image = np.array(Image.open(path).convert('RGB').resize((224, 224)), np.float32)
         mean = [123.68, 116.779, 103.939]
-        for i in range(3):
-            image[i] -= mean[i]
-            
+        image -= mean
+
         # 画像データは3次元配列で入っており，その軸は(幅，高さ，チャンネル)の順である
         # TODO chainerは(チャンネル，幅，高さ)で入力することを求めるのでtransposeを行なう
         image_for_chainer = image.transpose(('?', '?', '?'))
