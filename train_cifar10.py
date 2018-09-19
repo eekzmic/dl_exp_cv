@@ -71,7 +71,7 @@ def main():
     trainer.extend(extensions.Evaluator(val_iter, model, device=args.gpu))
     trainer.extend(extensions.dump_graph('main/loss'))
 
-    trainer.extend(extensions.snapshot(filename='snapshot_{.updater.epoch}'), trigger=(1, 'epoch'))
+    trainer.extend(extensions.snapshot(filename='snapshot_{.updater.epoch}'), trigger=(20, 'epoch'))
     trainer.extend(extensions.snapshot_object(model, 'model_{.updater.epoch}'),
                    trigger=(1, 'epoch'))
 
@@ -90,7 +90,7 @@ def main():
         ['epoch', 'main/loss', 'validation/main/loss',
          'main/accuracy', 'validation/main/accuracy', 'elapsed_time']))
 
-    trainer.extend(extensions.ProgressBar())
+    trainer.extend(extensions.ProgressBar(update_interval=1))
 
     if args.resume:
         chainer.serializers.load_npz(args.resume, trainer)
